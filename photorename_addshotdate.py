@@ -1,10 +1,14 @@
-# python 3.8.3
+# python=3.8.3
 # coding=utf-8
 
 '''
-  read exif information and get the 'EXIF DateTimeOriginal',
-  then add shot date as the prefix of filename in format of 'yy-mm-dd_'.
-  when exif informaiton is not available, use the last modification date.
+@File   photorename_addshotdate.py
+@Time   2022/08/18
+@Author TaylorGy 
+@Site   https://github.com/taylorgy
+@Desc   Read exif information of photos and get the 'EXIF DateTimeOriginal',
+        then add shot date as a prefix {yymmdd_} to the filename.
+        If exif is not available, add the last modification date.
 '''
 
 import os
@@ -15,7 +19,7 @@ import datetime
 
 # dir_root = os.getcwd()
 # mode_rename = False
-IMGSUFFIXes = ['.jpg', '.jpeg', '.png', '.tiff', '.webp', '.heic']
+IMGSUFFIX = ['.jpg', '.jpeg', '.png', '.tiff', '.webp', '.heic']
 FIELD = 'EXIF DateTimeOriginal'
 
 parser = argp.ArgumentParser(description='set photo folder path and rename mode.')
@@ -40,9 +44,10 @@ def main(args):
         print("folder: {}\n mode_rename: {}\n".format(dir_root, mode_rename))
 
     for file in os.listdir('.'):
-        filename   = os.path.splitext(file)[0].replace(' ', '_')
-        filesuffix = os.path.splitext(file)[1].lower()
-        if filesuffix in IMGSUFFIXes:
+        filestr = os.path.splitext(file)
+        filename   = filestr[0].replace(' ', '_')
+        filesuffix = filestr[1].lower()
+        if filesuffix in IMGSUFFIX:
             print("reading {}".format(file))
             with open(file, 'rb') as f:
                 tags = exifread.process_file(f, details=False)
@@ -51,9 +56,9 @@ def main(args):
             if not tags or FIELD not in tags.keys():
                 print('No {} found, use last modification date'.format(FIELD))
                 timestamp_m = os.path.getmtime(file)
-                shotdate = str(datetime.date.fromtimestamp(timestamp_m))[2:]
+                shotdate = str(datetime.date.fromtimestamp(timestamp_m))[2:].replace(':', '')
             else:
-                shotdate = tags[FIELD].values[2:10].replace(':', '-')
+                shotdate = tags[FIELD].values[2:10].replace(':', '')
 
             if not mode_rename:
                 newfilename = "{}_{}{}".format(shotdate, filename, filesuffix)
