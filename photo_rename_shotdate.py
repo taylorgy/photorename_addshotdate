@@ -2,7 +2,7 @@
 # coding=utf-8
 
 '''
-@File   photorename_addshotdate.py
+@File   photo_rename_shotdate.py
 @Time   2022/08/18
 @Author TaylorGy 
 @Site   https://github.com/taylorgy
